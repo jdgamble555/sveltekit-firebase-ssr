@@ -3,7 +3,6 @@ import { createFirebaseSession } from '$lib/firebase-session';
 
 const COOKIE_NAME = '__session';
 
-
 export const actions = {
 
     logout: async ({ cookies }) => {

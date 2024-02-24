@@ -1,104 +1,109 @@
-// Todos
-
 import {
+    type QuerySnapshot,
     collection,
     deleteDoc,
     doc,
-    getDocsFromCache,
     loadBundle,
-    namedQuery,
     onSnapshot,
     orderBy,
     query,
     serverTimestamp,
     setDoc,
     updateDoc,
-    where
+    where,
+    type DocumentData
 } from "firebase/firestore";
-
-import { type Subscriber, readable } from "svelte/store";
+import { type Readable, derived } from "svelte/store";
 import { auth, db } from "./firebase";
 
-export const getTodosFromCache = async (buffer: string) => {
+export const genText = () => Math.random().toString(36).substring(2, 15);
 
+export const snapToData = (q: QuerySnapshot<DocumentData, DocumentData>) => {
+
+    // creates todo data from snapshot
+    if (q.empty) {
+        return [];
+    }
+    return q.docs.map((doc) => {
+        const data = doc.data();
+        return {
+            ...data,
+            id: doc.id
+        }
+    }) as Todo[];
+}
+
+export const loadTodos = async (buffer: string) => {
+
+    // load bundle buffer
     const loadedState = await loadBundle(db, buffer);
 
     if (loadedState.taskState === 'Error') {
         throw 'Error loading data from server';
     }
-
-    const todoQuery = await namedQuery(db, 'todo-query');
-
-    if (!todoQuery) {
-        throw 'Error loading data from server';
-    }
-    const todoSnap = await getDocsFromCache(todoQuery);
-    const todos = todoSnap.empty
-        ? []
-        : todoSnap.docs.map((doc) => ({ ...doc.data(), id: doc.id })) as Todo[];
-
-    return todos;
 }
 
+export const useTodos = (user: Readable<UserType | null>, todos: Todo[]) => {
 
-export const getTodos = (uid: string, todos: Todo[]) => {
+    // filtering todos depend on user
+    return derived<Readable<UserType | null>, Todo[] | null>(
+        user, ($user, set) => {
+            if (!$user) {
+                set(null);
+                return;
+            }
 
-    //const uid = auth.currentUser?.uid;
+            // set default value from server
+            set(todos);
 
-    if (!uid) {
-        throw 'Must be logged in!';
-    }
-
-    return readable<Todo[] | null>(
-        todos,
-        (set: Subscriber<Todo[] | null>) =>
-            onSnapshot(
+            return onSnapshot(
                 query(
                     collection(db, 'todos'),
-                    where('uid', '==', uid),
+                    where('uid', '==', $user.uid),
                     orderBy('created')
                 ), (q) => {
+
+                    // is this a cache version?
                     console.log(q.metadata.fromCache);
-                    set(q.empty
-                        ? []
-                        : q.docs.map((doc) => ({ ...doc.data(), id: doc.id })) as Todo[]
-                    );
+
+                    set(snapToData(q));
                 })
-    );
-
+        });
 };
-
 
 export const addTodo = async (text: string) => {
 
+    // set todos on client for optimistic updates
     const uid = auth.currentUser?.uid;
 
     if (!uid) {
         throw 'Must be logged in!';
     }
 
-    const todoRef = doc(collection(db, 'todos'));
-
-    setDoc(todoRef, {
-        uid,
-        text,
-        complete: false,
-        created: serverTimestamp()
-    });
-
+    setDoc(
+        doc(collection(db, 'todos')),
+        {
+            uid,
+            text,
+            complete: false,
+            created: serverTimestamp()
+        });
 }
 
-export const updateTodo = (id: string, newStatus: boolean) => {
+export const updateTodo = (id: string, complete: boolean) => {
+
+    // update on client for optimistic updates
     updateDoc(
         doc(db, 'todos', id),
-        { complete: newStatus }
+        { complete }
     );
 }
 
 export const deleteTodo = (id: string) => {
 
-    const todoRef = doc(db, 'todos', id);
-
-    deleteDoc(todoRef);
+    // delete on client for optimistic updates
+    deleteDoc(
+        doc(db, 'todos', id)
+    );
 }
 

@@ -4,12 +4,13 @@
 	import LoginWithGoogle from './login-with-google.svelte';
 	import Logout from './logout.svelte';
 	import { page } from '$app/stores';
+	import { useUser } from '$lib/user';
 
-	$: user = $page.data.user;
+	const user = useUser($page.data.user);
 </script>
 
 <section class="flex flex-col gap-3 p-5 items-center">
-	{#if user}
+	{#if $user}
 		<Profile />
 		<Logout />
 		<Todos />

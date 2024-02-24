@@ -69,17 +69,18 @@ export async function logout(event: Event) {
     }
 }
 
-const user = () => readable<UserType | null>(
-    null,
-    (set: Subscriber<UserType | null>) =>
-        onIdTokenChanged(auth, (_user: User | null) => {
+const user = (defaultUser: UserType | null = null) => readable<UserType | null>(
+    defaultUser,
+    (set: Subscriber<UserType | null>) => {
+        return onIdTokenChanged(auth, (_user: User | null) => {
             if (!_user) {
                 set(null);
                 return;
             }
             const { displayName, photoURL, uid, email } = _user;
             set({ displayName, photoURL, uid, email });
-        })
+        });
+    }
 );
 
-export const useUser = () => useSharedStore('user', user);
+export const useUser = (defaultUser: UserType | null = null) => useSharedStore('user', user, defaultUser);

@@ -1,60 +1,38 @@
 
-import { adminDB } from '$lib/firebase-admin';
+import { genText } from '$lib/todos';
+import { getTodos } from '$lib/todos-server';
 import type { PageServerLoad } from './$types';
 
 export const load = (async ({ locals: { getSession } }) => {
 
     const session = await getSession();
 
+    // always generate random things on server
+    const text = genText();
+
     if (!session) {
         return {
+            text,
             user: null,
-            todosBundle: null
+            todoBuffer: null
         }
     }
 
-    const {
-        name: displayName,
-        email,
-        picture: photoURL,
-        uid
-    } = session;
-
     const user: UserType = {
-        displayName,
-        email,
-        photoURL,
-        uid
+        displayName: session.name,
+        email: session.email,
+        photoURL: session.picture,
+        uid: session.uid
     };
 
-    const todoSnapshot = await adminDB
-        .collection('todos')
-        .where('uid', '==', session.uid)
-        .orderBy('created')
-        .get();
-
-    const bundleId = Date.now().toString();
-
-    const bundleBuffer = adminDB
-        .bundle(bundleId)
-        .add('todo-query', todoSnapshot)
-        .build();
-
-    const todos = todoSnapshot.empty
-        ? []
-        : todoSnapshot.docs.map((doc) => {
-            const data = doc.data();
-            return {
-                ...data,
-                id: doc.id,
-                created: data.created.toMillis()
-            }
-        }) as Todo[];
+    // get todos from firebase admin
+    const { todos, todoBuffer } = await getTodos(session.uid);
 
     return {
+        text,
         user,
         todos,
-        todoBundle: bundleBuffer.toString()
+        todoBuffer
     };
 
 }) satisfies PageServerLoad;

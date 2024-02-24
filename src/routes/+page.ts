@@ -1,25 +1,15 @@
 import { browser } from '$app/environment';
-import { getTodosFromCache } from '$lib/todos';
+import { loadTodos } from '$lib/todos';
 import type { PageLoad } from './$types';
 
 export const load = (async ({ data }) => {
 
-    if (data.todoBundle) {
+    if (browser && data.todoBuffer) {
 
         // add admin query to client cache
-        const todos = browser
-            ? await getTodosFromCache(data.todoBundle)
-            : data.todos;
-
-        return {
-            ...data,
-            todos
-        };
+        await loadTodos(data.todoBuffer);
     }
 
-    return {
-        user: null,
-        todosBundle: null
-    };
+    return data;
 
 }) satisfies PageLoad;
