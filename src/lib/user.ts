@@ -44,13 +44,18 @@ export async function loginWithGoogle(event: Event) {
     }
 }
 
-export async function logout(event: { currentTarget: EventTarget & HTMLFormElement }) {
+export async function logout(event: Event) {
+
+    const form = event.target as HTMLFormElement;
 
     // sign out on client
     await signOut(auth);
 
     // signout on server
-    const response = await fetch(event.currentTarget.action, { method: 'POST' });
+    const response = await fetch(form.action, {
+        method: 'POST',
+        body: new FormData(form)
+    });
 
     const result: ActionResult = deserialize(await response.text());
 

@@ -1,8 +1,5 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	//import { useUser } from '$lib/user';
-
-	//const user = useUser();
 
 	$: user = $page.data.user;
 </script>

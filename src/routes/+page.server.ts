@@ -27,7 +27,7 @@ export const load = (async ({ locals: { getSession } }) => {
         uid
     };
 
-    const taskSnapshot = await adminDB
+    const todoSnapshot = await adminDB
         .collection('todos')
         .where('uid', '==', session.uid)
         .orderBy('created')
@@ -37,12 +37,24 @@ export const load = (async ({ locals: { getSession } }) => {
 
     const bundleBuffer = adminDB
         .bundle(bundleId)
-        .add('todo-query', taskSnapshot)
+        .add('todo-query', todoSnapshot)
         .build();
+
+    const todos = todoSnapshot.empty
+        ? []
+        : todoSnapshot.docs.map((doc) => {
+            const data = doc.data();
+            return {
+                ...data,
+                id: doc.id,
+                created: data.created.toMillis()
+            }
+        }) as Todo[];
 
     return {
         user,
-        todosBundle: bundleBuffer.toString()
+        todos,
+        todoBundle: bundleBuffer.toString()
     };
 
 }) satisfies PageServerLoad;
