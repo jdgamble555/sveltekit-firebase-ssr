@@ -1,7 +1,6 @@
 import { error, redirect, type Actions } from '@sveltejs/kit';
 import { createFirebaseSession } from '$lib/firebase-session';
-
-const COOKIE_NAME = '__session';
+import { COOKIE_NAME } from '$lib/firebase-admin';
 
 export const actions = {
 

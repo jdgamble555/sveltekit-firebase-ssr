@@ -2,7 +2,10 @@ import { error } from "@sveltejs/kit";
 import { adminDB } from "./firebase-admin";
 import type { FirebaseError } from "firebase-admin/app";
 
-type QuerySnap = FirebaseFirestore.QuerySnapshot<FirebaseFirestore.DocumentData, FirebaseFirestore.DocumentData>;
+type QuerySnap = FirebaseFirestore.QuerySnapshot<
+    FirebaseFirestore.DocumentData,
+    FirebaseFirestore.DocumentData
+>;
 
 const snapToData = (q: QuerySnap) => {
 

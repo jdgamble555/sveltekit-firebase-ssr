@@ -15,3 +15,5 @@ if (!getApps().length) {
 
 export const adminAuth = getAuth();
 export const adminDB = getFirestore();
+
+export const COOKIE_NAME = '__session';

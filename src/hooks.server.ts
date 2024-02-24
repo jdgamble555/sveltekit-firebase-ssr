@@ -1,7 +1,6 @@
+import { COOKIE_NAME } from "$lib/firebase-admin";
 import { getFirebaseSession } from "$lib/firebase-session";
 import type { Handle } from "@sveltejs/kit";
-
-const COOKIE_NAME = '__session';
 
 export const handle: Handle = async ({ event, resolve }) => {
 
