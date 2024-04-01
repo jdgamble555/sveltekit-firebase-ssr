@@ -11,23 +11,33 @@ import {
     setDoc,
     updateDoc,
     where,
-    type DocumentData
+    type DocumentData,
+    Timestamp
 } from "firebase/firestore";
 import { type Readable, derived } from "svelte/store";
 import { auth, db } from "./firebase";
 
-export const genText = () => Math.random().toString(36).substring(2, 15);
+export const genText = () => Math
+    .random()
+    .toString(36)
+    .substring(2, 15);
 
-export const snapToData = (q: QuerySnapshot<DocumentData, DocumentData>) => {
+export const snapToData = (
+    q: QuerySnapshot<DocumentData, DocumentData>
+) => {
 
     // creates todo data from snapshot
     if (q.empty) {
         return [];
     }
     return q.docs.map((doc) => {
-        const data = doc.data();
+        const data = doc.data({
+            serverTimestamps: 'estimate'
+        });
+        const created = data.created as Timestamp;
         return {
             ...data,
+            created: created.toDate(),
             id: doc.id
         }
     }) as Todo[];
@@ -43,7 +53,10 @@ export const loadTodos = async (buffer: string) => {
     }
 }
 
-export const useTodos = (user: Readable<UserType | null>, todos: Todo[]) => {
+export const useTodos = (
+    user: Readable<UserType | null>,
+    todos: Todo[]
+) => {
 
     // filtering todos depend on user
     return derived<Readable<UserType | null>, Todo[] | null>(

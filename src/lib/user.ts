@@ -32,7 +32,9 @@ export async function loginWithGoogle(event: Event) {
         body
     });
 
-    const result: ActionResult = deserialize(await response.text());
+    const result: ActionResult = deserialize(
+        await response.text()
+    );
 
     switch (result.type) {
         case 'error':
@@ -57,7 +59,9 @@ export async function logout(event: Event) {
         body: new FormData(form)
     });
 
-    const result: ActionResult = deserialize(await response.text());
+    const result: ActionResult = deserialize(
+        await response.text()
+    );
 
     switch (result.type) {
         case 'error':

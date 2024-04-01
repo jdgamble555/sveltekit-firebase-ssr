@@ -30,7 +30,10 @@ export const actions = {
         } = await createFirebaseSession(idToken);
 
         if (firebase_error) {
-            error(firebase_error.status, firebase_error.message);
+            error(
+                firebase_error.status,
+                firebase_error.message
+            );
         }
 
         // set generated session cookie

@@ -13,9 +13,13 @@ export const handle: Handle = async ({ event, resolve }) => {
             return null;
         }
 
-        const { error, decodedClaims } = await getFirebaseSession(sessionCookie);
+        const {
+            error,
+            decodedClaims
+        } = await getFirebaseSession(sessionCookie);
 
         if (error) {
+            console.error(error);
             return null;
         }
 

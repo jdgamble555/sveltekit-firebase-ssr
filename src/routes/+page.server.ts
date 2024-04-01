@@ -3,7 +3,9 @@ import { genText } from '$lib/todos';
 import { getTodos } from '$lib/todos-server';
 import type { PageServerLoad } from './$types';
 
-export const load = (async ({ locals: { getSession } }) => {
+export const load = (async ({
+    locals: { getSession }
+}) => {
 
     const session = await getSession();
 
@@ -26,7 +28,10 @@ export const load = (async ({ locals: { getSession } }) => {
     };
 
     // get todos from firebase admin
-    const { todos, todoBuffer } = await getTodos(session.uid);
+    const {
+        todos,
+        todoBuffer
+    } = await getTodos(session.uid);
 
     return {
         text,

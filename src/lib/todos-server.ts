@@ -1,6 +1,8 @@
 import { error } from "@sveltejs/kit";
 import { adminDB } from "./firebase-admin";
 import type { FirebaseError } from "firebase-admin/app";
+import type { Timestamp } from "firebase-admin/firestore";
+import { dev } from "$app/environment";
 
 type QuerySnap = FirebaseFirestore.QuerySnapshot<
     FirebaseFirestore.DocumentData,
@@ -15,10 +17,11 @@ const snapToData = (q: QuerySnap) => {
     }
     return q.docs.map((doc) => {
         const data = doc.data();
+        const created = data.created as Timestamp;
         return {
             ...data,
             id: doc.id,
-            created: data.created.toMillis()
+            created: created.toDate()
         }
     }) as Todo[];
 }
@@ -49,6 +52,10 @@ export const getTodos = async (uid: string) => {
         .toString();
 
     const todos = snapToData(todoSnapshot);
+
+    if (dev) {
+        console.log(todos);
+    }
 
     return { todos, todoBuffer };
 }
