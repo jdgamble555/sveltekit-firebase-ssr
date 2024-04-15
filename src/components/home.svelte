@@ -6,8 +6,6 @@
 	import { page } from '$app/stores';
 	import { useUser } from '$lib/user';
 
-	console.log($page.data.user);
-
 	const user = useUser($page.data.user);
 </script>
 

@@ -77,7 +77,7 @@ export const useTodos = (
                 ), (q) => {
 
                     // is this a cache version?
-                    console.log(q.metadata.fromCache);
+                    console.log('Cached: ', q.metadata.fromCache);
 
                     set(snapToData(q));
                 })

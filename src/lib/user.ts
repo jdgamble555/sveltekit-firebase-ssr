@@ -73,7 +73,9 @@ export async function logout(event: Event) {
     }
 }
 
-const user = (defaultUser: UserType | null = null) => readable<UserType | null>(
+const user = (
+    defaultUser: UserType | null = null
+) => readable<UserType | null>(
     defaultUser,
     (set: Subscriber<UserType | null>) => {
         return onIdTokenChanged(auth, (_user: User | null) => {
@@ -82,9 +84,11 @@ const user = (defaultUser: UserType | null = null) => readable<UserType | null>(
                 return;
             }
             const { displayName, photoURL, uid, email } = _user;
+            console.log(defaultUser);
             set({ displayName, photoURL, uid, email });
         });
     }
 );
 
-export const useUser = (defaultUser: UserType | null = null) => useSharedStore('user', user, defaultUser);
+export const useUser = (defaultUser: UserType | null = null) =>
+    useSharedStore('user', user, defaultUser);
