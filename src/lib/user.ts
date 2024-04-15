@@ -45,6 +45,7 @@ export async function addSessionToServer(idToken: string) {
         case 'error':
             applyAction(result);
             console.error(result.error);
+            logout();
             break;
         case 'redirect':
             console.log('adding session to server...');
@@ -52,17 +53,22 @@ export async function addSessionToServer(idToken: string) {
     }
 }
 
-export async function logout(event: Event) {
-
-    const form = event.target as HTMLFormElement;
+export async function logout() {
 
     // sign out on client
     await signOut(auth);
 
+    await removeSessionFromServer();
+}
+
+export async function removeSessionFromServer() {
+
+    const action = '/api/auth?/logout';
+
     // signout on server
-    const response = await fetch(form.action, {
+    const response = await fetch(action, {
         method: 'POST',
-        body: new FormData(form)
+        body: new FormData()
     });
 
     const result: ActionResult = deserialize(
