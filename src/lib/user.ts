@@ -11,9 +11,7 @@ import { useSharedStore } from "./use-shared";
 import { type ActionResult } from "@sveltejs/kit";
 import { applyAction, deserialize } from "$app/forms";
 
-export async function loginWithGoogle(event: Event) {
-
-    const form = event.target as HTMLFormElement;
+export async function loginWithGoogle() {
 
     // login with google and get token
     const credential = await signInWithPopup(
@@ -23,11 +21,18 @@ export async function loginWithGoogle(event: Event) {
 
     const idToken = await credential.user.getIdToken();
 
+    await addSessionToServer(idToken);
+}
+
+export async function addSessionToServer(idToken: string) {
+
     // send token to server and create cookie
-    const body = new FormData(form);
+    const body = new FormData();
     body.append('idToken', idToken);
 
-    const response = await fetch(form.action, {
+    const action = "/api/auth?/loginWithGoogle";
+
+    const response = await fetch(action, {
         method: 'POST',
         body
     });
@@ -42,6 +47,7 @@ export async function loginWithGoogle(event: Event) {
             console.error(result.error);
             break;
         case 'redirect':
+            console.log('adding session to server...');
             applyAction(result);
     }
 }
@@ -84,8 +90,13 @@ const user = (
                 return;
             }
             const { displayName, photoURL, uid, email } = _user;
-            console.log(defaultUser);
             set({ displayName, photoURL, uid, email });
+
+            // add session to server if there is none
+            if (!defaultUser) {
+                _user.getIdToken()
+                    .then((token) => addSessionToServer(token));
+            }
         });
     }
 );
