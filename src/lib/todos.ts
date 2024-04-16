@@ -16,6 +16,7 @@ import {
 } from "firebase/firestore";
 import { type Readable, derived } from "svelte/store";
 import { auth, db } from "./firebase";
+import { dev } from "$app/environment";
 
 export const genText = () => Math
     .random()
@@ -76,8 +77,9 @@ export const useTodos = (
                     orderBy('created')
                 ), (q) => {
 
-                    // is this a cache version?
-                    console.log('Cached: ', q.metadata.fromCache);
+                    if (dev) {
+                      console.log('Cached: ', q.metadata.fromCache);  
+                    }                    
 
                     set(snapToData(q));
                 })

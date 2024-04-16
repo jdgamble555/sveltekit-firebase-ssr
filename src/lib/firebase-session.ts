@@ -30,7 +30,9 @@ export const createFirebaseSession = async (idToken: string) => {
             path: '/'
         };
 
-        const sessionCookie = await adminAuth.createSessionCookie(idToken, { expiresIn });
+        const sessionCookie = await adminAuth.createSessionCookie(idToken, {
+            expiresIn
+        });
 
         return { sessionCookie, options };
     }
@@ -54,6 +56,6 @@ export const getFirebaseSession = async (sessionCookie: string) => {
         };
         return { error }
     }
-    
+
     return { decodedClaims };
 }

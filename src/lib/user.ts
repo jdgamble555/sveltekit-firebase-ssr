@@ -91,18 +91,16 @@ const user = (
     defaultUser,
     (set: Subscriber<UserType | null>) => {
         return onIdTokenChanged(auth, (_user: User | null) => {
+            // if no user on server, logout
+            if (!defaultUser) {
+                logout();
+            }
             if (!_user) {
                 set(null);
                 return;
             }
             const { displayName, photoURL, uid, email } = _user;
             set({ displayName, photoURL, uid, email });
-
-            // add session to server if there is none
-            if (!defaultUser) {
-                _user.getIdToken()
-                    .then((token) => addSessionToServer(token));
-            }
         });
     }
 );
