@@ -17,7 +17,7 @@
 	<td class={todo.complete ? 'text-green-600 line-through' : ''}>
 		{todo.text}
 	</td>
-	<td>{todo.id}</td>
+	<td class={todo.complete ? 'text-green-600 line-through' : ''}>{todo.id}</td>
 	<td>
 		{#if todo.complete}
 			<button on:click={toggleStatus}> ✔️ </button>
@@ -29,4 +29,3 @@
 		<button on:click={remove}> 🗑 </button>
 	</td>
 </tr>
-

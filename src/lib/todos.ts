@@ -35,10 +35,10 @@ export const snapToData = (
         const data = doc.data({
             serverTimestamps: 'estimate'
         });
-        const created = data.created as Timestamp;
+        const createdAt = data.createdAt as Timestamp;
         return {
             ...data,
-            created: created.toDate(),
+            createdAt: createdAt.toDate(),
             id: doc.id
         }
     }) as Todo[];
@@ -74,7 +74,7 @@ export const useTodos = (
                 query(
                     collection(db, 'todos'),
                     where('uid', '==', $user.uid),
-                    orderBy('created')
+                    orderBy('createdAt')
                 ), (q) => {
 
                     if (dev) {
@@ -101,7 +101,7 @@ export const addTodo = async (text: string) => {
             uid,
             text,
             complete: false,
-            created: serverTimestamp()
+            createdAt: serverTimestamp()
         });
 }
 

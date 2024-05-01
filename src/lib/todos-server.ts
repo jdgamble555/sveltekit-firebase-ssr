@@ -17,11 +17,11 @@ const snapToData = (q: QuerySnap) => {
     }
     return q.docs.map((doc) => {
         const data = doc.data();
-        const created = data.created as Timestamp;
+        const createdAt = data.createdAt as Timestamp;
         return {
             ...data,
             id: doc.id,
-            created: created.toDate()
+            createdAt: createdAt.toDate()
         }
     }) as Todo[];
 }
@@ -34,7 +34,7 @@ export const getTodos = async (uid: string) => {
         todoSnapshot = await adminDB
             .collection('todos')
             .where('uid', '==', uid)
-            .orderBy('created')
+            .orderBy('createdAt')
             .get();
 
     } catch (e) {
