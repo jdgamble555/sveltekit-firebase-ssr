@@ -35,7 +35,7 @@ export const snapToData = (
         const data = doc.data({
             serverTimestamps: 'estimate'
         });
-        const createdAt = data.createdAt as Timestamp;
+        const createdAt = data['createdAt'] as Timestamp;
         return {
             ...data,
             createdAt: createdAt.toDate(),

@@ -59,4 +59,3 @@ export const getTodos = async (uid: string) => {
 
     return { todos, todoBuffer };
 }
-
